@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plan Your Journey | CEEKAY Tours</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=6">
+
+</head>
+
+<body class="plan-page">
+<header class="planner-header">
+  <div class="header-container">
+    <a class="logo" href="index.html" aria-label="CEEKAY Tours home">
+      <img src="Logo.png" alt="CEEKAY Tours logo">
+    </a>
+    <nav><a href="index.html">Home</a><a href="index.html#packages">Packages</a><a href="https://wa.me/94776600560" target="_blank" rel="noopener noreferrer">Contact</a></nav>
+  </div>
+</header>
+<main class="planner-main">
+  <section class="planner-intro">
+    <span class="eyebrow">Tailor-made Sri Lanka travel</span>
+    <h1>Plan Your Journey</h1>
+    <p>Tell us your dates, passengers and preferred destinations. We will prepare a personalised travel plan for you.</p>
+  </section>
+
+
+
+
+<form id="tripForm" class="planner-form" novalidate>
+<div class="form-section-title"><span>01</span><div><h2>Travel Details</h2><p>Start with your dates and passenger information.</p></div></div>
+
+<label>Travel Start Date</label>
+<input type="date" id="travelDate" required>
+
+<label>Number of Passengers</label>
+<input type="number" id="passengers" min="1" required>
+
+<div id="passengerDetails"></div>
+
+<div class="form-divider"></div>
+<div class="form-section-title"><span>02</span><div><h2>Build Your Itinerary</h2><p>Add the places you would like to visit each day.</p></div></div>
+<h3>Number of Travel Days</h3>
+<input type="number" id="totalDays" min="1" max="10" value="1">
+<button type="button" onclick="generateDays()">Create Plan</button>
+
+<div id="daysContainer" style="margin-top:20px;"></div>
+
+<div class="form-divider"></div>
+<h3>Your Planned Itinerary</h3>
+<div id="itinerarySummary" style="margin-top:10px; font-weight:bold;"></div>
+
+<div class="form-divider"></div>
+<label>Special Requests</label>
+<textarea id="specialRequest" rows="4"></textarea>
+
+<div class="form-divider"></div>
+<div class="form-section-title"><span>03</span><div><h2>Your Contact Details</h2><p>We will use these details only to respond to your enquiry.</p></div></div>
+
+<label>Your Name</label>
+<input type="text" id="customerName" required>
+
+<label>Email</label>
+<input type="email" id="customerEmail" required>
+
+<label>WhatsApp Number</label>
+<input type="text" id="customerWhatsapp" required>
+
+<div style="margin-top:20px; display:flex; gap:15px; flex-wrap:wrap;">
+
+    <button type="button" onclick="sendWhatsApp()" class="plan-btn">
+        Submit via WhatsApp
+    </button>
+
+    <button type="button" onclick="sendEmail()" class="plan-btn" style="background:#555;">
+        Send via Email
+    </button>
+
+</div>
+
+
+</form>
+</main>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const travelDate = document.getElementById("travelDate");
+    travelDate.min = new Date().toISOString().split("T")[0];
+    generateDays();
+});
+
+// ===== Passenger Generator =====
+document.getElementById("passengers").addEventListener("change", function () {
+
+    let count = parseInt(this.value);
+    let container = document.getElementById("passengerDetails");
+    container.innerHTML = "";
+
+    if (!count || count < 1) return;
+
+    for (let i = 1; i <= count; i++) {
+
+        container.innerHTML += `
+            <div style="margin-bottom:15px;">
+                <h4>Passenger ${i}</h4>
+
+                <label>Age</label>
+                <input type="number" min="0" class="age" required>
+
+                <label>Gender</label>
+                <select class="gender" required>
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+        `;
+    }
+});
+
+
+// ===== Generate Days =====
+function generateDays() {
+
+    let container = document.getElementById("daysContainer");
+    let summary = document.getElementById("itinerarySummary");
+
+    container.innerHTML = "";
+    summary.innerHTML = "";
+
+    let days = parseInt(document.getElementById("totalDays").value);
+
+    for (let i = 1; i <= days; i++) {
+
+        container.innerHTML += `
+            <div style="margin-bottom:20px;">
+                <h4>Day ${String(i).padStart(2,'0')}</h4>
+                <input type="text" 
+                       placeholder="Example: Sigiriya, Dambulla"
+                       oninput="updateSummary()"
+                       id="day${i}"
+                       style="width:100%;">
+            </div>
+        `;
+    }
+}
+
+
+// ===== Update Summary =====
+function updateSummary() {
+
+    let days = parseInt(document.getElementById("totalDays").value);
+    let summary = "";
+
+    for (let i = 1; i <= days; i++) {
+
+        let input = document.getElementById(`day${i}`);
+        if (input && input.value.trim() !== "") {
+
+            summary += `Day ${String(i).padStart(2,'0')} – ${input.value}\n`;
+        }
+    }
+
+    document.getElementById("itinerarySummary").innerHTML =
+        summary.replace(/\n/g, "<br>");
+}
+
+
+// ===== WhatsApp Submit =====
+function collectFormData() {
+
+    let travelDate = document.getElementById("travelDate").value;
+    let passengers = document.getElementById("passengers").value;
+    let specialRequest = document.getElementById("specialRequest").value;
+    let name = document.getElementById("customerName").value;
+    let email = document.getElementById("customerEmail").value;
+    let whatsapp = document.getElementById("customerWhatsapp").value;
+
+    let passengerDetails = "";
+    let ages = document.querySelectorAll(".age");
+    let genders = document.querySelectorAll(".gender");
+
+    for (let i = 0; i < ages.length; i++) {
+        passengerDetails += `Passenger ${i+1}: Age ${ages[i].value}, ${genders[i].value}\n`;
+    }
+
+    let days = parseInt(document.getElementById("totalDays").value);
+    let itinerary = "";
+
+    for (let i = 1; i <= days; i++) {
+        let input = document.getElementById(`day${i}`);
+        if (input && input.value.trim() !== "") {
+            itinerary += `Day ${String(i).padStart(2,'0')} – ${input.value}\n`;
+        }
+    }
+
+    return {
+        travelDate,
+        passengers,
+        passengerDetails,
+        itinerary,
+        specialRequest,
+        name,
+        email,
+        whatsapp
+    };
+}
+
+
+function validatePlannerForm() {
+    const form = document.getElementById("tripForm");
+    const passengers = parseInt(document.getElementById("passengers").value, 10);
+    const days = parseInt(document.getElementById("totalDays").value, 10);
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return false;
+    }
+    if (!passengers || document.querySelectorAll(".age").length !== passengers) {
+        alert("Please enter the number of passengers and complete each passenger's details.");
+        document.getElementById("passengers").focus();
+        return false;
+    }
+    if (!days || days < 1 || document.querySelectorAll('#daysContainer input').length !== days) {
+        alert("Please click Create Plan and add your travel days.");
+        document.getElementById("totalDays").focus();
+        return false;
+    }
+    return true;
+}
+
+function sendWhatsApp() {
+    if (!validatePlannerForm()) return;
+
+    let data = collectFormData();
+
+    let message =
+`Hello CEEKAY Tours,
+I would like to plan my journey.
+
+Travel Date: ${data.travelDate}
+Passengers: ${data.passengers}
+
+Passenger Details:
+${data.passengerDetails}
+
+Planned Itinerary:
+${data.itinerary}
+
+Special Requests:
+${data.specialRequest}
+
+Contact:
+Name: ${data.name}
+Email: ${data.email}
+WhatsApp: ${data.whatsapp}
+`;
+
+    let encoded = encodeURIComponent(message);
+
+    window.open(`https://wa.me/94776600560?text=${encoded}`, "_blank");
+}
+
+
+function sendEmail() {
+    if (!validatePlannerForm()) return;
+
+    let data = collectFormData();
+
+    let subject = encodeURIComponent("New Travel Inquiry - CEEKAY Tours");
+
+    let body =
+`Travel Date: ${data.travelDate}
+Passengers: ${data.passengers}
+
+Passenger Details:
+${data.passengerDetails}
+
+Planned Itinerary:
+${data.itinerary}
+
+Special Requests:
+${data.specialRequest}
+
+Contact:
+Name: ${data.name}
+Email: ${data.email}
+WhatsApp: ${data.whatsapp}
+`;
+
+    let encodedBody = encodeURIComponent(body);
+
+    window.location.href =
+        `mailto:ceekayecotrails@gmail.com?subject=${subject}&body=${encodedBody}`;
+}
+
+</script>
+
+</body>
+</html>
+
