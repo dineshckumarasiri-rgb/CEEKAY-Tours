@@ -2500,3 +2500,23 @@ body:not(.plan-page) > header > .logo img {
         height: 44px;
     }
 }
+
+/* Remove the box around the About section logo */
+.about-section .about-image {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.about-section .about-image::after {
+    display: none !important;
+}
+
+.about-section .about-image img {
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
