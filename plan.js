@@ -186,5 +186,5 @@ WhatsApp: ${data.whatsapp}
     let encodedBody = encodeURIComponent(body);
 
     window.location.href =
-        `mailto:ceekayecotrails@gmail.com?subject=${subject}&body=${encodedBody}`;
+        `mailto:ceekaytours@gmail.com?subject=${subject}&body=${encodedBody}`;
 }
